@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { labels, taskTypes, difficulties, statuses, origins } from '@/domain/contracts';
 import type { QuestionDetail, Term } from '@/domain/library';
 
-async function write<T>(url: string, body: unknown, method = 'POST'): Promise<T> {
+export async function write<T>(url: string, body: unknown, method = 'POST'): Promise<T> {
   const response = await fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },
@@ -17,7 +17,7 @@ async function write<T>(url: string, body: unknown, method = 'POST'): Promise<T>
   return result.data;
 }
 
-function useSubmission() {
+export function useSubmission() {
   const [pending, setPending] = useState(false),
     [error, setError] = useState('');
   const locked = useRef(false);
@@ -37,7 +37,7 @@ function useSubmission() {
   }
   return { pending, error, run };
 }
-function FormError({ error }: { error: string }) {
+export function FormError({ error }: { error: string }) {
   return error ? (
     <p className="form-error" role="alert">
       {error}
@@ -206,7 +206,11 @@ export function QuestionForm({ question, terms }: { question?: QuestionDetail; t
       </section>
       <FormError error={error} />
       <div className="form-actions">
-        <span className="muted small">自建题目，无需填写来源。</span>
+        <span className="muted small">
+          {question && question.creationMethod !== 'USER_CREATED'
+            ? '编辑不会覆盖原始问法与来源证据。'
+            : '自建题目，无需填写来源。'}
+        </span>
         <Link className="button secondary" href={question ? `/questions/${question.id}` : '/'}>
           取消
         </Link>

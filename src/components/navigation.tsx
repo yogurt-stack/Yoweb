@@ -32,6 +32,22 @@ export function Navigation() {
       active: pathname === '/' && search.get('archive') === 'archived',
     },
     { href: '/taxonomy', icon: '⌘', text: '领域与标签', active: pathname === '/taxonomy' },
+    {
+      href: '/sources',
+      icon: '▧',
+      text: '来源材料',
+      active:
+        pathname.startsWith('/sources') ||
+        pathname.startsWith('/documents') ||
+        pathname === '/imports/new',
+    },
+    {
+      href: '/inbox',
+      icon: '⇣',
+      text: '收录 Inbox',
+      active:
+        pathname === '/inbox' || (pathname.startsWith('/imports/') && pathname !== '/imports/new'),
+    },
   ];
   return (
     <nav aria-label="主导航">

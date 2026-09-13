@@ -23,7 +23,7 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: 'npm run db:migrate && npm run dev -- --port 3100',
+    command: 'npm run db:migrate && npm run start -- --port 3100',
     url: 'http://127.0.0.1:3100',
     reuseExistingServer: false,
     timeout: 120000,

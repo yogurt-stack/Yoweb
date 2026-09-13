@@ -59,6 +59,7 @@ export function getConnection() {
     const connection = openDatabase();
     try {
       connection.sqlite.prepare('SELECT id FROM questions LIMIT 1').get();
+      connection.sqlite.prepare('SELECT id FROM import_batches LIMIT 1').get();
     } catch {
       connection.sqlite.close();
       throw new Error('数据库尚未初始化，请先运行 npm run db:migrate');

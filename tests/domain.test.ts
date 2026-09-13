@@ -214,7 +214,7 @@ test('导出包含归档与全部关联，可脱离 UI 阅读；外键禁止静�
   library.addWording(q.id, { text: '导出原文', sourceLocator: '本地笔记' });
   library.setArchived(q.id, true);
   const data = JSON.parse(JSON.stringify(library.exportData()));
-  assert.equal(data.formatVersion, 1);
+  assert.equal(data.formatVersion, 2);
   assert.equal(data.questions[0].id, q.id);
   assert.ok(data.questions[0].archivedAt);
   assert.equal(data.originalWordings[0].questionId, q.id);

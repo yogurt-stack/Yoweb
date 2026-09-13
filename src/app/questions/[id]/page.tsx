@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { library } from '@/domain/server';
+import { library, ingestion } from '@/domain/server';
 import { labels, DomainError } from '@/domain/contracts';
 import { ArchiveButton, WordingForm } from '@/components/forms';
+import { EvidenceSection } from '@/components/source-views';
 
 export default async function QuestionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -45,7 +46,10 @@ export default async function QuestionPage({ params }: { params: Promise<{ id: s
           <span>{labels[question.taskType]}</span>
           <span>·</span>
           <span>参考难度：{labels[question.difficulty]}</span>
-          <span>· 自建题目</span>
+          <span>
+            · {question.creationMethod === 'USER_CREATED' ? '自建题目' : '手动收录'} ·{' '}
+            {labels[question.contentOrigin]}
+          </span>
         </div>
         <h2 className="question-text">{question.text}</h2>
         <div className="tags">
@@ -65,6 +69,7 @@ export default async function QuestionPage({ params }: { params: Promise<{ id: s
           {question.updatedAt.slice(0, 16).replace('T', ' ')} UTC
         </p>
       </article>
+      <EvidenceSection questionId={id} context={ingestion().questionEvidence(id)} />
       <div className="detail-columns">
         <section className="panel">
           <h2>思考笔记</h2>

@@ -3,6 +3,19 @@ import type { Connection } from '../db/connection';
 import { newId } from '../db/connection';
 import { originalWordings, questions, questionTerms, terms } from '../db/schema';
 import {
+  sources,
+  documents,
+  documentVersions,
+  importBatches,
+  importItems,
+  evidence,
+  questionMentions,
+  companies,
+  jobs,
+  interviews,
+  interviewOccurrences,
+} from '../db/schema';
+import {
   createQuestionInput,
   updateQuestionInput,
   wordingInput,
@@ -311,13 +324,24 @@ export class Library {
 
   exportData() {
     return this.connection.sqlite.transaction(() => ({
-      formatVersion: 1,
+      formatVersion: 2,
       application: 'Yoweb',
       exportedAt: new Date().toISOString(),
       questions: this.db.select().from(questions).all(),
       terms: this.listTerms(),
       questionTerms: this.db.select().from(questionTerms).all(),
       originalWordings: this.db.select().from(originalWordings).all(),
+      sources: this.db.select().from(sources).all(),
+      documents: this.db.select().from(documents).all(),
+      documentVersions: this.db.select().from(documentVersions).all(),
+      importBatches: this.db.select().from(importBatches).all(),
+      importItems: this.db.select().from(importItems).all(),
+      evidence: this.db.select().from(evidence).all(),
+      questionMentions: this.db.select().from(questionMentions).all(),
+      companies: this.db.select().from(companies).all(),
+      jobs: this.db.select().from(jobs).all(),
+      interviews: this.db.select().from(interviews).all(),
+      interviewOccurrences: this.db.select().from(interviewOccurrences).all(),
     }))();
   }
 }

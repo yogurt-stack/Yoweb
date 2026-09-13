@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 import { DomainError } from '@/domain/contracts';
-import { library } from '@/domain/server';
+import { library, ingestion } from '@/domain/server';
 import { isLocalHost } from '@/http/local';
 
 export const runtime = 'nodejs';
@@ -58,6 +58,7 @@ async function handle(request: NextRequest, context: Context) {
     const [resource, id, action] = path;
     const service = library(),
       method = request.method;
+    const ingest = ingestion();
     let data: unknown,
       status = 200;
     if (resource === 'questions' && path.length === 1 && method === 'GET') {
@@ -86,6 +87,54 @@ async function handle(request: NextRequest, context: Context) {
       action === 'wordings'
     ) {
       data = service.addWording(id, await readJson(request));
+      status = 201;
+    } else if (resource === 'sources' && path.length === 1 && method === 'GET') {
+      data = ingest.listSources();
+    } else if (resource === 'sources' && path.length === 1 && method === 'POST') {
+      data = ingest.createSource(await readJson(request));
+      status = 201;
+    } else if (resource === 'sources' && path.length === 2 && method === 'GET') {
+      data = { ...ingest.getSource(id), documents: ingest.listDocuments(id) };
+    } else if (resource === 'documents' && path.length === 1 && method === 'GET') {
+      data = ingest.listDocuments();
+    } else if (resource === 'documents' && path.length === 2 && method === 'GET') {
+      data = ingest.getDocument(id);
+    } else if (resource === 'documents' && path.length === 2 && method === 'PATCH') {
+      data = ingest.setDocumentStatus(id, await readJson(request));
+    } else if (
+      resource === 'imports' &&
+      path.length === 2 &&
+      id === 'manual' &&
+      method === 'POST'
+    ) {
+      data = ingest.importManual(await readJson(request));
+      status = data && (data as { duplicate: boolean }).duplicate ? 200 : 201;
+    } else if (resource === 'imports' && path.length === 2 && method === 'GET') {
+      data = ingest.getBatch(id);
+    } else if (resource === 'inbox' && path.length === 1 && method === 'GET') {
+      data = ingest.listBatches();
+    } else if (resource === 'inbox' && path.length === 2 && id === 'review' && method === 'POST') {
+      data = ingest.review(await readJson(request));
+    } else if (resource === 'interviews' && path.length === 1 && method === 'POST') {
+      data = ingest.createInterview(await readJson(request));
+      status = 201;
+    } else if (resource === 'jobs' && path.length === 1 && method === 'POST') {
+      data = ingest.createJob(await readJson(request));
+      status = 201;
+    } else if (
+      resource === 'questions' &&
+      path.length === 3 &&
+      action === 'evidence' &&
+      method === 'GET'
+    ) {
+      data = ingest.questionEvidence(id);
+    } else if (
+      resource === 'questions' &&
+      path.length === 3 &&
+      action === 'occurrences' &&
+      method === 'POST'
+    ) {
+      data = ingest.addOccurrence(id, await readJson(request));
       status = 201;
     } else if (resource === 'terms' && path.length === 1 && method === 'GET') {
       data = service.listTerms();
